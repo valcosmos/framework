@@ -5,6 +5,7 @@ import { kebabCase } from 'scule'
 import type { Nuxt, NuxtApp, NuxtPlugin } from '@nuxt/schema'
 import { findPath, resolveFiles, normalizePlugin, normalizeTemplate, compileTemplate, templateUtils, tryResolveModule } from '@nuxt/kit'
 
+import { distDir } from '../dirs'
 import * as defaultTemplates from './templates'
 
 export function createApp (nuxt: Nuxt, options: Partial<NuxtApp> = {}): NuxtApp {
@@ -87,6 +88,9 @@ export async function resolveApp (nuxt: Nuxt, app: NuxtApp) {
   app.plugins = [
     ...nuxt.options.plugins.map(normalizePlugin)
   ]
+  if (nuxt.options.experimental.legacyPlugins) {
+    app.plugins.unshift(normalizePlugin(resolve(distDir, 'app/compat/legacy-app')))
+  }
   for (const config of nuxt.options._layers.map(layer => layer.config)) {
     app.plugins.push(...[
       ...(config.plugins || []),
